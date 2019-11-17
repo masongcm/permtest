@@ -23,20 +23,13 @@
 	{bf:treat}: Treatment indicator (required, must be 0/1)    {break}
 
 {p 4 4 2}
-Permutation inference    {break}
+Inference    {break}
 	{bf:np}: Number of permutations (required)    {break}
 	{bf:blockvars} ({it:varlist}): variables to be used for block permutation (if not specified, defaults to naive)    {break}
-	{bf:lcvars} ({it:varlist}): variables to be used for linear conditioning    {break}
 	{bf:naive}: whether to perform naive permutation, disregarding blocks (overrides {bf:blockvars_})    {break}
-	
-{p 4 4 2}
-Inverse probability weighting    {break}
+	{bf:lcvars} ({it:varlist}): variables to be used for linear conditioning    {break}
 	{bf:ipwcovars1} ({it:varlist}): variables for IPW step (applies to all outcomes in {it:depvars} if specified alone)    {break}
 	{bf:ipwcovars2-ipwcovars5} : variables for IPW step (applies to each separate outcome in {it:depvars})    {break}
-	
-{p 4 4 2}
-Saving    {break}
-	{bf:savemat}  ({it:string}): path where to save output in matrix form    {break}
 	
 {p 4 4 2}
 Other    {break}
@@ -44,6 +37,10 @@ Other    {break}
 	{bf:effsize}: display treatment effects in terms of effect size (standardised by control group SD)    {break}
 	{bf:verbose}: print more information about progress to console    {break}
 
+{p 4 4 2}
+Saving    {break}
+	{bf:savemat}  ({it:string}): path where to save output in matrix form    {break}
+	
 {space 4}{hline}
 
 {p 4 4 2}
@@ -55,19 +52,54 @@ Other    {break}
 {title:Description}
 
 {p 4 4 2}
-{bf:permtest} performs permutation-based inference with multiple outcomes
+{bf:permtest} performs permutation-based inference of treatment effects 
+in randomised treatments. 
+It includes adjustments for stratified randomisation design, 
+multiple hypotheses, treatment imbalance and non-random attrition.
 
 
 {title:Options}
 
 {p 4 4 2}
-{bf:whatever} does yak yak
-
-{p 8 8 2} Use {bf:>} for additional paragraphs within and option 
-description to indent the paragraph.
+{bf:treat} specifies the variable containing the treatment indicator. It must be
+binary coded with values of 0 and 1.
 
 {p 4 4 2}
-{bf:2nd option} etc.
+{bf:np} specifies the desired number of permutations of the outcome vector.
+
+{p 4 4 2}
+{bf:blockvars} ({it:varlist}) can be used to supply one or more strata used in the
+randomisation protocol. Permutations will then be performed {it:within} 
+blocks defined by the values (or combination of values, if more than one
+stratum is supplied) in {bf:blockvars}. The strata variables should be
+categorical, and shouldn{c 39}t partition the sample in sets that are too small.
+
+{p 4 4 2}
+{bf:naive} overrides the {bf:blockvars} option, by instructing the permutation
+to disregard strata and just permute outcomes across the whole sample.
+
+{p 4 4 2}
+{bf:lcvars} ({it:varlist}) can be used to supply a list of variables to linearly 
+condition on during inference. The conditioning is performed using the 
+methodology from  {browse "https://www.jstor.org/stable/1391660":Freedman and Lane (1983)}.
+Typical usage includes the case of baseline covariate imbalance.
+
+{p 4 4 2}
+{bf:ipwcovars1} ({it:varlist}) can be used to supply a list of variables to perform 
+an inverse probability weighting adjustment on the treatment effect estimates.
+Typical usage includes corrections for non-random attrition through the 
+study period.
+Denote by W_j an indicator for outcome Y_j being observed. The {bf:ipwcovars1}
+option computes a set of weights from a logit regression of W_j on {it:varlist}, 
+and uses them to adjust the final treatment effect estimates. Note that:
+
+{p 8 8 2} The logit weights are computed {it:for each permutation}: as such this option 
+significantly increases the time intensity of the command.
+
+{p 8 8 2} Supplying only {bf:ipwcovars1} uses the same set of adjustment variables for
+each outcome in {it:depvars}. If you want to specify different sets of adjustment
+variables for each outcome, use {bf:ipwcovars1__-__ipwcovars5}.
+
 
 
 {title:Remarks}
